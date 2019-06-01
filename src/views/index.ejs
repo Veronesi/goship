@@ -1,0 +1,37 @@
+<table>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>nombre</th>
+            <th>domicilio</th>
+            <th>localidad</th>
+            <th>dni</th>
+            <th>fecha nacimiento</th>
+            <th>fecha ingreso</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (data){ %>
+            <% for(var i=0; i < data.length;i++){ %>
+                <tr>
+                    <td><%= (i+1) %></td>
+                    <td><%= data[i].nombre %></td>
+                    <td><%= data[i].domicilio %></td>
+                    <td><%= data[i].localidad %></td>
+                    <td><%= data[i].dni %></td>
+                    <td><%= data[i].f_nacimiento %></td>
+                    <td><%= data[i].f_ingreso %></td>
+                </tr>
+            <% } %>
+        <% } %>
+    </tbody>
+</table>
+<form action="/add" method="post">
+    <input type="text" value="nombre" placeholder="nombre">
+    <input type="text" value="domicilio" placeholder="domicilio">
+    <input type="text" value="localidad" placeholder="localidad">
+    <input type="number" value="dni" placeholder="dni">
+    <input type="date" value="f_nacimiento" placeholder="f_nacimiento">
+    <input type="date" value="f_ingreso" placeholder="f_ingreso">
+    <button type="submit">Send</button>
+</form>
