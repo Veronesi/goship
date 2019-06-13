@@ -74,6 +74,8 @@ controller.getDespacho = (req, res) => {
                         req.getConnection((err, conn) => {
                             conn.query('SELECT e.id FROM usuarios u, embarca e WHERE u.dni = ? AND u.id = e.idusuario AND e.id = ?', [data.dni, data.idembarca], (err, row) => {
                                 if(row.length){
+                                    // Fijarme si ya hay un despacho en ese periodo de timpo
+                                    // SELECT * FROM despacho WHERE (fechasalida BETWEEN '2018-08-06' AND '2018-08-06' AND horasalida BETWEEN '17:00:00' AND '18:00:00') OR (fechallegada BETWEEN '2018-08-06' AND '2018-08-06' AND horallegada BETWEEN '17:00:00' AND '18:00:00') OR (fechasalida <= '2018-08-06' AND '2018-08-06' <= fechallegada AND horasalida <= '17:00:00' AND '18:00:00' <= horallegada);
                                     req.getConnection((err, conn) => {
                                         conn.query('INSERT INTO despacho (idusuario, fechasalida, horasalida, detalle, fechallegada, horallegada, personas, idembarca, observacion, destino) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [row[0].id, data.fechasalida, data.horasalida, data.detalle, data.fechallegada, data.horallegada, data.personas ,data.idembarca, data.observacion ,data.destino], (err, row) => {
                                             response.despacho = data
