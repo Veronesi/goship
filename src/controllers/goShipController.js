@@ -60,6 +60,53 @@ controller.login = (req, res) => {
     }
 }
 
+controller.getDespacho = (req, res) => {
+    var data = req.body
+    var response = {}
+    if(typeof data.detalle == "undefined"){ data.detalle = " "}
+    if(typeof data.personas == "undefined"){ data.personas = " "}
+    if(typeof data.observacion == "undefined"){ data.observacion = " "}
+    if(data.dni && data.token && data.fechasalida && data.horasalida && data.fechallegada && data.horallegada && data.idembarca && data.destino && data.detalle && data.personas && data.observacion){
+        if(data.dni && data.token){
+            req.getConnection((err, conn) => {
+                conn.query('SELECT u.id FROM usuarios u WHERE u.dni = ? AND u.token = ?', [data.dni, data.token], (err, row) => {
+                    if(row.length){
+                        req.getConnection((err, conn) => {
+                            conn.query('SELECT e.id FROM usuarios u, embarca e WHERE u.dni = ? AND u.id = e.idusuario AND e.id = ?', [data.dni, data.idembarca], (err, row) => {
+                                if(row.length){
+                                    req.getConnection((err, conn) => {
+                                        conn.query('INSERT INTO despacho (idusuario, fechasalida, horasalida, detalle, fechallegada, horallegada, personas, idembarca, observacion, destino) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [row[0].id, data.fechasalida, data.horasalida, data.detalle, data.fechallegada, data.horallegada, data.personas ,data.idembarca, data.observacion ,data.destino], (err, row) => {
+                                            response.despacho = data
+                                            res.json(response)   
+                                         })
+                                    })
+                                }else{
+                                    response.error = 'ERROR_EMBARCA'
+                                    response.erdescrition = 'Esa embarca no pertenece a ese usuario'
+                                    res.json(response)
+                                }
+                            })
+                        })
+                    }else{
+                        response.error = 'ERROR_LOGIN'
+                        response.erdescrition = 'Dni o contraseña incorrecta'
+                        res.json(response)
+                    }
+                })
+            })
+        }else{
+            response.error = 'REQUIRED_DNIORTOKEN'
+            response.erdescrition = 'Se esperaba un dni y un token'
+            res.json(response)
+        }
+    }else{
+        response.error = 'ERROR_data'
+        response.erdescrition = 'faltan campos'
+        res.json(response)
+    }
+    
+}
+
 controller.getEmbarca = (req, res) => {
     let data = req.body
     let response = {}
@@ -96,7 +143,6 @@ controller.getEmbarca = (req, res) => {
             })
         })
     }else{
-        response.dni = 0
         response.error = 'REQUIRED_DNIORTOKEN'
         response.erdescrition = 'Se esperaba un dni y un token'
         res.json(response)
