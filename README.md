@@ -4,8 +4,7 @@
 
 Devueve el token para realizar las transacciones
 
-**Response body (raw)**
-
+**Request body (raw)**
 ```
 
 {
@@ -14,9 +13,7 @@ Devueve el token para realizar las transacciones
 }
 ```
 
-
-**Request body (raw)**
-
+**Response body (raw)**
 ```
 
 {
