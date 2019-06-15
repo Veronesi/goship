@@ -29,10 +29,8 @@ Crea un nuevo despacho
 {
 	"dni" : "11111111",
 	"token" : "ed11d0d4117957001ebbf21d5923efc12f640c75",
-	"fechasalida" : "2018-08-06",
-	"horasalida" : "17:00:00",
-	"fechallegada" : "2018-08-06",
-	"horallegada" : "21:00:00",
+	"salida" : "2018-08-06 17:00:00",
+	"llegada" : "2018-08-06 21:00:00",
 	"idembarca" : "1",
 	"destino" : "Isla",
 	"observacion" :" ",
