@@ -1,6 +1,6 @@
 # goship
 
-### POST api/login
+## POST api/login
 
 Devueve el token para realizar las transacciones
 
@@ -20,9 +20,9 @@ Devueve el token para realizar las transacciones
 }
 ```
 
-### PUT api/despacho
+## PUT api/despacho
 
-Devueve el token para realizar las transacciones
+Crea un nuevo despacho
 
 **Request body (raw)**
 ```
