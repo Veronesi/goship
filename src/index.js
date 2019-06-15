@@ -25,8 +25,8 @@ app.use(myConnection(mysql, {
     database: 'goship'
 }, 'single'))
 
-app.use(express.urlencoded({extended: false}))
-/*app.use(express.json())*/
+/*app.use(express.urlencoded({extended: false}))*/
+app.use(express.json({type: '*/*'}))
 
 // routes
 app.use('/', userRoutes)

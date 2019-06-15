@@ -31,7 +31,6 @@ controller.login = (req, res) => {
     let data = req.body
     let response = {}
     if(data.dni){
-        response.dni = data.dni
         req.getConnection((err, conn) => {
             conn.query('SELECT s.nombre, u.token FROM socios s , usuarios u WHERE u.dni = ? AND u.dni = s.dni AND password = ?', [data.dni, data.password], (err, row) => {
                 shasum.update(data.dni+data.password);
@@ -66,21 +65,33 @@ controller.getDespacho = (req, res) => {
     if(typeof data.detalle == "undefined"){ data.detalle = " "}
     if(typeof data.personas == "undefined"){ data.personas = " "}
     if(typeof data.observacion == "undefined"){ data.observacion = " "}
-    if(data.dni && data.token && data.fechasalida && data.horasalida && data.fechallegada && data.horallegada && data.idembarca && data.destino && data.detalle && data.personas && data.observacion){
+    if(data.dni && data.token && data.salida  && data.llegada && data.idembarca && data.destino && data.detalle && data.personas && data.observacion){
         if(data.dni && data.token){
             req.getConnection((err, conn) => {
                 conn.query('SELECT u.id FROM usuarios u WHERE u.dni = ? AND u.token = ?', [data.dni, data.token], (err, row) => {
                     if(row.length){
                         req.getConnection((err, conn) => {
-                            conn.query('SELECT e.id FROM usuarios u, embarca e WHERE u.dni = ? AND u.id = e.idusuario AND e.id = ?', [data.dni, data.idembarca], (err, row) => {
+                            conn.query('SELECT u.id FROM usuarios u, embarca e WHERE u.dni = ? AND u.id = e.idusuario AND e.id = ?', [data.dni, data.idembarca], (err, row) => {
                                 if(row.length){
-                                    // Fijarme si ya hay un despacho en ese periodo de timpo
-                                    // SELECT * FROM despacho WHERE (fechasalida BETWEEN '2018-08-06' AND '2018-08-06' AND horasalida BETWEEN '17:00:00' AND '18:00:00') OR (fechallegada BETWEEN '2018-08-06' AND '2018-08-06' AND horallegada BETWEEN '17:00:00' AND '18:00:00') OR (fechasalida <= '2018-08-06' AND '2018-08-06' <= fechallegada AND horasalida <= '17:00:00' AND '18:00:00' <= horallegada);
                                     req.getConnection((err, conn) => {
-                                        conn.query('INSERT INTO despacho (idusuario, fechasalida, horasalida, detalle, fechallegada, horallegada, personas, idembarca, observacion, destino) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [row[0].id, data.fechasalida, data.horasalida, data.detalle, data.fechallegada, data.horallegada, data.personas ,data.idembarca, data.observacion ,data.destino], (err, row) => {
-                                            response.despacho = data
-                                            res.json(response)   
-                                         })
+                                        var idUsuario = row[0].id
+                                        conn.query(`SELECT * FROM despacho WHERE ${idUsuario} = idusuario AND((salida BETWEEN '${data.salida}' AND '${data.llegada}' )OR (llegada BETWEEN '${data.salida}' AND '${data.llegada}' )OR(salida <= '${data.salida}' AND '${data.llegada}' <= llegada ))`, [data.dni, data.idembarca], (err, row) => {
+                                            if(row.length){
+                                                response.error = 'ERROR_DESPACHO'
+                                                response.erdescrition = 'ya existe un despacho entre esas horas'
+                                                res.json(response)
+                                            }else{
+                                                req.getConnection((err, conn) => {
+                                                    conn.query(`INSERT INTO despacho (idusuario, detalle, personas, idembarca, observacion, destino, llegada, salida) VALUES ('${idUsuario}', '${data.detalle}', '${data.personas}', '${data.idembarca}', '${data.observacion}', '${data.destino}', '${data.llegada}', '${data.salida}' )`, [data.dni, data.idembarca], (err, row) => {
+                                                    
+                                                    })
+                                                })   
+                                                response.despacho = "ok"
+                                                res.json(response)
+                                                
+                                            }
+        
+                                        })  
                                     })
                                 }else{
                                     response.error = 'ERROR_EMBARCA'
@@ -104,6 +115,7 @@ controller.getDespacho = (req, res) => {
     }else{
         response.error = 'ERROR_data'
         response.erdescrition = 'faltan campos'
+        response.json = req.body
         res.json(response)
     }
     
@@ -149,6 +161,12 @@ controller.getEmbarca = (req, res) => {
         response.erdescrition = 'Se esperaba un dni y un token'
         res.json(response)
     }
+}
+
+controller.test = (req, res) => {
+    let data = req.body
+    console.log(data.dni)
+    res.json({hola: data.pdw})
 }
 
 module.exports = controller
